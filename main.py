@@ -1,7 +1,9 @@
 from flask import Flask, render_template, jsonify, request
 import requests
+import logging
 
 app = Flask(__name__)
+logging.basicConfig(level=logging.INFO)
 
 @app.route('/')
 def index():
@@ -13,12 +15,15 @@ def get_landmarks():
     if not bbox:
         return jsonify({'error': 'Missing bbox parameter'}), 400
 
-    # Wikipedia API endpoint for geosearch
+    west, south, east, north = map(float, bbox.split(','))
+    center_lat = (north + south) / 2
+    center_lon = (east + west) / 2
+
     api_url = 'https://en.wikipedia.org/w/api.php'
     params = {
         'action': 'query',
         'list': 'geosearch',
-        'gscoord': f'{bbox.split(",")[1]}|{bbox.split(",")[0]}',  # Center of the bbox
+        'gscoord': f'{center_lat}|{center_lon}',
         'gsradius': '10000',  # 10km radius
         'gslimit': '50',
         'format': 'json'
