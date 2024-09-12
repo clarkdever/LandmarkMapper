@@ -30,3 +30,28 @@ body, html {
     margin: 0;
     font-size: 14px;
 }
+
+#filter-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+}
+
+.filter-btn {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: none;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.filter-btn.active {
+    background-color: #4CAF50;
+    color: white;
+}

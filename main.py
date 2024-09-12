@@ -29,11 +29,14 @@ def get_landmarks():
 
     landmarks = []
     for place in data['query']['geosearch']:
+        # Determine landmark type based on keywords in the title
+        landmark_type = determine_landmark_type(place['title'])
         landmarks.append({
             'pageid': place['pageid'],
             'title': place['title'],
             'lat': place['lat'],
-            'lon': place['lon']
+            'lon': place['lon'],
+            'type': landmark_type
         })
 
     return jsonify(landmarks)
@@ -60,6 +63,22 @@ def get_landmark_info(pageid):
         'title': page['title'],
         'extract': extract[:200] + '...' if len(extract) > 200 else extract
     })
+
+def determine_landmark_type(title):
+    historical_keywords = ['castle', 'palace', 'monument', 'memorial', 'museum', 'ruins', 'archaeological']
+    natural_keywords = ['park', 'mountain', 'lake', 'river', 'forest', 'beach', 'island']
+    cultural_keywords = ['theater', 'theatre', 'gallery', 'stadium', 'opera', 'library']
+
+    title_lower = title.lower()
+    
+    if any(keyword in title_lower for keyword in historical_keywords):
+        return 'historical'
+    elif any(keyword in title_lower for keyword in natural_keywords):
+        return 'natural'
+    elif any(keyword in title_lower for keyword in cultural_keywords):
+        return 'cultural'
+    else:
+        return 'other'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
