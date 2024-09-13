@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let cachedLandmarks = {};
     let cachedLandmarkInfo = {};
     let currentFilter = 'all';
+    let landmarkCounts = {};
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -29,14 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         fetch(`/get_landmarks?bbox=${bbox}`)
             .then(response => response.json())
-            .then(landmarks => {
-                console.log('Fetched landmarks:', landmarks.length);
-                landmarks.forEach(landmark => {
+            .then(data => {
+                console.log('Fetched landmarks:', data.landmarks.length);
+                data.landmarks.forEach(landmark => {
                     if (!cachedLandmarks[landmark.pageid]) {
                         cachedLandmarks[landmark.pageid] = landmark;
                     }
                 });
+                landmarkCounts = data.counts;
                 updateMarkers();
+                updateFilterButtons();
                 document.getElementById('loading-indicator').style.display = 'none';
             })
             .catch(error => {
@@ -85,6 +88,15 @@ document.addEventListener('DOMContentLoaded', () => {
             <p class='more-info-link'><a href='${wikipediaLink}' target='_blank'>Would you like to know more?</a></p>
         `);
         marker.openPopup();
+    }
+
+    function updateFilterButtons() {
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        filterButtons.forEach(button => {
+            const type = button.getAttribute('data-type');
+            const count = landmarkCounts[type] || 0;
+            button.textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} (${count})`;
+        });
     }
 
     // Add event listeners to filter buttons

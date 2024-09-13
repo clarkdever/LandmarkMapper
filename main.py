@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify, request
 import requests
 import logging
+from collections import Counter
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -33,8 +34,8 @@ def get_landmarks():
     data = response.json()
 
     landmarks = []
+    type_counter = Counter()
     for place in data['query']['geosearch']:
-        # Determine landmark type based on keywords in the title
         landmark_type = determine_landmark_type(place['title'])
         landmarks.append({
             'pageid': place['pageid'],
@@ -43,8 +44,14 @@ def get_landmarks():
             'lon': place['lon'],
             'type': landmark_type
         })
+        type_counter[landmark_type] += 1
 
-    return jsonify(landmarks)
+    type_counter['all'] = len(landmarks)
+
+    return jsonify({
+        'landmarks': landmarks,
+        'counts': dict(type_counter)
+    })
 
 @app.route('/get_landmark_info/<int:pageid>')
 def get_landmark_info(pageid):
