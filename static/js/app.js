@@ -77,7 +77,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updatePopupContent(marker, info, landmark) {
-        marker.setPopupContent(`<h3>${info.title}</h3><p>${info.extract}</p><p>Type: ${landmark.type}</p>`);
+        const wikipediaLink = `https://en.wikipedia.org/wiki?curid=${landmark.pageid}`;
+        marker.setPopupContent(`
+            <h3>${info.title}</h3>
+            <p>${info.extract}</p>
+            <p>Type: ${landmark.type}</p>
+            <p class='more-info-link'><a href='${wikipediaLink}' target='_blank'>Would you like to know more?</a></p>
+        `);
         marker.openPopup();
     }
 
