@@ -1,7 +1,6 @@
 from flask import Flask, render_template, jsonify, request
 import requests
 import logging
-import os
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -35,6 +34,7 @@ def get_landmarks():
 
     landmarks = []
     for place in data['query']['geosearch']:
+        # Determine landmark type based on keywords in the title
         landmark_type = determine_landmark_type(place['title'])
         landmarks.append({
             'pageid': place['pageid'],
@@ -86,6 +86,4 @@ def determine_landmark_type(title):
         return 'other'
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 3003))  # Changed default port to 3003
-    print(f"Starting Flask server on port {port}")
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=5000)
