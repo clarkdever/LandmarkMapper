@@ -24,11 +24,11 @@ agentRequireRestartOnSave = false
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python main.py"
+args = "poetry install --no-root && python main.py"
 waitForPort = 5000
 
 [deployment]
-run = ["sh", "-c", "python main.py"]
+run = ["sh", "-c", "poetry install --no-root && python main.py"]
 
 [[ports]]
 localPort = 5000
