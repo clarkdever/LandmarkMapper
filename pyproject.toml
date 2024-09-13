@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "repl-nix-landmarkmapper"
 version = "0.1.0"
-description = "A web app using Flask and Vanilla JS that displays local landmarks on an interactive map using Wikipedia data"
+description = ""
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 
@@ -10,16 +10,7 @@ python = "^3.11"
 flask = "^3.0.3"
 requests = "^2.32.3"
 
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-start = "python main.py"
-
-[virtualenvs]
-create = true
-in-project = true
-
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.5"
