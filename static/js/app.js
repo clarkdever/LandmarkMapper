@@ -37,9 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         cachedLandmarks[landmark.pageid] = landmark;
                     }
                 });
-                landmarkCounts = data.counts;
                 updateMarkers();
-                updateFilterButtons();
                 document.getElementById('loading-indicator').style.display = 'none';
             })
             .catch(error => {
@@ -55,28 +53,36 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateMarkers() {
         markers.clearLayers();
         const bounds = map.getBounds();
-        Object.values(cachedLandmarks).forEach(landmark => {
-            if (bounds.contains([landmark.lat, landmark.lon]) && 
-                (currentFilter === 'all' || landmark.type === currentFilter)) {
-                const marker = L.marker([landmark.lat, landmark.lon])
-                    .bindPopup(`<h3>${landmark.title}</h3><p>Loading...</p>`, { className: 'landmark-popup' });
-                
-                marker.on('click', () => {
-                    if (cachedLandmarkInfo[landmark.pageid]) {
-                        updatePopupContent(marker, cachedLandmarkInfo[landmark.pageid], landmark);
-                    } else {
-                        fetch(`/get_landmark_info/${landmark.pageid}`)
-                            .then(response => response.json())
-                            .then(info => {
-                                cachedLandmarkInfo[landmark.pageid] = info;
-                                updatePopupContent(marker, info, landmark);
-                            });
-                    }
-                });
+        landmarkCounts = { all: 0, historical: 0, natural: 0, cultural: 0, other: 0 };
 
-                markers.addLayer(marker);
+        Object.values(cachedLandmarks).forEach(landmark => {
+            if (bounds.contains([landmark.lat, landmark.lon])) {
+                landmarkCounts[landmark.type]++;
+                landmarkCounts.all++;
+
+                if (currentFilter === 'all' || landmark.type === currentFilter) {
+                    const marker = L.marker([landmark.lat, landmark.lon])
+                        .bindPopup(`<h3>${landmark.title}</h3><p>Loading...</p>`, { className: 'landmark-popup' });
+                    
+                    marker.on('click', () => {
+                        if (cachedLandmarkInfo[landmark.pageid]) {
+                            updatePopupContent(marker, cachedLandmarkInfo[landmark.pageid], landmark);
+                        } else {
+                            fetch(`/get_landmark_info/${landmark.pageid}`)
+                                .then(response => response.json())
+                                .then(info => {
+                                    cachedLandmarkInfo[landmark.pageid] = info;
+                                    updatePopupContent(marker, info, landmark);
+                                });
+                        }
+                    });
+
+                    markers.addLayer(marker);
+                }
             }
         });
+
+        updateFilterButtons();
     }
 
     function updatePopupContent(marker, info, landmark) {
