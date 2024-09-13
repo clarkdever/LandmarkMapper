@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const map = L.map('map').setView([30.2672, -97.7431], 13); // Set initial view to Austin, TX
     let markers = L.layerGroup().addTo(map);
     let cachedLandmarks = {};
+    let cachedLandmarkInfo = {};
     let currentFilter = 'all';
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -58,17 +59,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     .bindPopup(`<h3>${landmark.title}</h3><p>Loading...</p>`, { className: 'landmark-popup' });
                 
                 marker.on('click', () => {
-                    fetch(`/get_landmark_info/${landmark.pageid}`)
-                        .then(response => response.json())
-                        .then(info => {
-                            marker.setPopupContent(`<h3>${info.title}</h3><p>${info.extract}</p><p>Type: ${landmark.type}</p>`);
-                            marker.openPopup();
-                        });
+                    if (cachedLandmarkInfo[landmark.pageid]) {
+                        updatePopupContent(marker, cachedLandmarkInfo[landmark.pageid], landmark);
+                    } else {
+                        fetch(`/get_landmark_info/${landmark.pageid}`)
+                            .then(response => response.json())
+                            .then(info => {
+                                cachedLandmarkInfo[landmark.pageid] = info;
+                                updatePopupContent(marker, info, landmark);
+                            });
+                    }
                 });
 
                 markers.addLayer(marker);
             }
         });
+    }
+
+    function updatePopupContent(marker, info, landmark) {
+        marker.setPopupContent(`<h3>${info.title}</h3><p>${info.extract}</p><p>Type: ${landmark.type}</p>`);
+        marker.openPopup();
     }
 
     // Add event listeners to filter buttons
