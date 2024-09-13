@@ -1,17 +1,7 @@
-[packager]
-language = "python"
-run = ["sudo poetry install"]
-
-[env]
-REPLIT_PYTHON_PACKAGE_LAYER = "1"
+modules = ["python-3.11"]
 
 [nix]
 channel = "stable-24_05"
-
-[[mounts]]
-source = ".replit"
-path = "/home/runner/.replit"
-modules = ["python-3.11"]
 
 [workflows]
 runButton = "Project"
